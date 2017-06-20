@@ -178,6 +178,9 @@ FNodeSwitch.prototype.run = function(callback){
 
 ////////////////////////////////////////////////////
 var getNodeType = function(tree){
+    if(tree == null){
+        return null;
+    }
     if(Array.isArray(tree)){
         if(tree.length > 0 && tree[0]=="loop"){
             return FNodeType.While;
@@ -187,10 +190,10 @@ var getNodeType = function(tree){
         }
     }
     var t = typeof tree;
-    if(t == "object"){
+    if(t === "object"){
         return FNodeType.Switch;
     }
-    if(t == "function"){
+    if(t === "function"){
         return FNodeType.Action;
     }
     return null;
