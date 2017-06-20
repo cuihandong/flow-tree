@@ -1,17 +1,22 @@
+# flow-tree
 
-目标:
-js中常常有各种毁掉函数，有时候这些回掉函数构成一个复杂的系统，难以阅读和维护。
-为了解决这个问题，flow通过构建一棵树（类似行为树），让整体的流程一目了然。
 
-//...
-//作为节点的函数的写法
+> js中常常有各种毁掉函数，有时候这些回掉函数构成一个复杂的系统，难以阅读和维护。
+> 为了解决这个问题，flow通过构建一棵树（类似行为树），让整体的流程一目了然。
+
+# 用法
+
+## 作为节点的函数的写法
+```js
 var fun1 = function(next){
     setTimeout(function(){
         next({type:FNode.FNodeResultType.Next});
     ,1000}
 }
+```
 
-//顺序
+## 顺序节点
+```js
 sequence:
 [
     fun1,
@@ -21,10 +26,13 @@ sequence:
     tree2,
     tree3,
 ]
+```
 
-//循环,子节点返回FNode.FNodeResultType.Break退出
-//next({type:FNode.FNodeResultType.Break});
+## 循环节点
+> 子节点返回FNode.FNodeResultType.Break退出,
+> next({type:FNode.FNodeResultType.Break});
 
+```js
 while:
 [
     "loop",
@@ -34,17 +42,22 @@ while:
     tree1,
     tree2
 ]
+```
 
-//switch case节点
-//fun0计算switch的值，通过next设置。next({type:FNode.FNodeResultType.Next,value:"value1"})
+## switch case节点
+> fun0计算switch的值，通过next设置。next({type:FNode.FNodeResultType.Next,value:"value1"})
+
+```js
 switch:
 {
     switch: fun0,
     case_value1:tree1,
     case_value2:fun2,
 }
+```
 
-//一棵树的列子
+## 一棵树
+```js
 SlotScene.prototype.build = function() {
     var tree = [
         "loop",
@@ -90,3 +103,4 @@ SlotScene.prototype.build = function() {
 var slotScene = new SlotScene();
 slotScene.build()   //建立树
 slotScene.runNode.run();  //执行数
+```
