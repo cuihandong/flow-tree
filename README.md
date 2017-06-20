@@ -4,9 +4,15 @@
 > js中常常有各种毁掉函数，有时候这些回掉函数构成一个复杂的系统，难以阅读和维护。
 > 为了解决这个问题，flow通过构建一棵树（类似行为树），让整体的流程一目了然。
 
-# 用法
+## 安装
 
-## 作为节点的函数的写法
+```js
+npm install flow-tree
+```
+
+## 用法
+
+### 作为节点的函数的写法
 ```js
 var fun1 = function(next){
     setTimeout(function(){
@@ -15,7 +21,7 @@ var fun1 = function(next){
 }
 ```
 
-## 顺序节点
+### 顺序节点
 ```js
 sequence:
 [
@@ -28,7 +34,7 @@ sequence:
 ]
 ```
 
-## 循环节点
+### 循环节点
 > 子节点返回FNode.FNodeResultType.Break退出,
 > next({type:FNode.FNodeResultType.Break});
 
@@ -44,7 +50,7 @@ while:
 ]
 ```
 
-## switch case节点
+### switch case节点
 > fun0计算switch的值，通过next设置。next({type:FNode.FNodeResultType.Next,value:"value1"})
 
 ```js
@@ -56,7 +62,7 @@ switch:
 }
 ```
 
-## 一棵树
+### 一棵树
 ```js
 SlotScene.prototype.build = function() {
     var tree = [
