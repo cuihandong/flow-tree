@@ -1,0 +1,12 @@
+{
+  "name": "flow",
+  "version": "1.0.0",
+  "description": "可以灵活的插入操作，并且容易看出整体程序流向",
+  "main": "index.js",
+  "author": "cuihandong <cuihandong2002@163.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cuihandong/flow.git"
+  },
+}
