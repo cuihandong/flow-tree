@@ -1,5 +1,5 @@
 {
-  "name": "flow",
+  "name": "flow-tree",
   "version": "0.0.1",
   "description": "可以灵活的插入操作，并且容易看出整体程序流向",
   "main": "index.js",
