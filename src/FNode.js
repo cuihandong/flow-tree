@@ -17,6 +17,33 @@ var FNodeType = {
 };
 
 ////////////////////////////////////////////////////
+var isNodeResultType = function(value){
+    for(var k in FNodeResultType){
+        if(value == FNodeResultType[k]){
+            return true;
+        }
+    }
+    return false;
+}
+
+var next = function(callback,res){
+    if(callback){
+        var resNormal = res;
+        if(res==null){
+            resNormal = {type:FNodeResultType.Next};
+        }
+        if(isNodeResultType(res)){
+            resNormal = {type:res};
+        }
+        if(typeof res == "object" && res.type==null){
+            res.type = FNodeResultType.Next;
+            resNormal = res;
+        }
+        callback(resNormal)
+    }
+}
+
+////////////////////////////////////////////////////
 var FNodeAction = function(target){
     this.target = target;
 };
@@ -29,17 +56,13 @@ FNodeAction.prototype.run = function(callback){
     if(this.f){
         if(this.target){
             this.f.call(this.target,function(res){
-                if(callback){
-                    callback(res)
-                }
+                next(callback,res)
             });
 
         }
         else{
             this.f(function(res){
-                if(callback){
-                    callback(res)
-                }
+                next(callback,res)
             });
         }
     }
@@ -85,7 +108,7 @@ FNodeSequence.prototype.runChild = function(index) {
     }
     else{
         if(this.callback){
-            this.callback({type:FNodeResultType.Next});
+            next(this.callback,FNodeResultType.Next);
             this.callback = null;
         }
     }
@@ -125,7 +148,7 @@ FNodeWhile.prototype.runChild = function(index){
                     }
                     case FNodeResultType.Break : {
                         if(self.callback){
-                            self.callback({type:FNodeResultType.Next});
+                            next(self.callback,FNodeResultType.Next);
                             self.callback = null;
                         }
                         break;
@@ -161,15 +184,11 @@ FNodeSwitch.prototype.run = function(callback){
             }
             if(node){
                 node.run(function(res){
-                    if(callback){
-                        callback({type:FNodeResultType.Next});
-                    }
+                    next(callback,FNodeResultType.Next);
                 })
             }
             else{
-                if(callback){
-                    callback({type:FNodeResultType.Next});
-                }
+                next(callback,FNodeResultType.Next);
             }
         })
     }

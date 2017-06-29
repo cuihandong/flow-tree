@@ -3,12 +3,6 @@
  */
 var FNode = require("./../src/FNode");
 
-var FNodeInfo = function(){
-    this.action = null;
-    this.target = null;
-}
-
-
 var SlotScene = function(){
 
     this.leftFreeSpinCount = 0;
@@ -146,7 +140,8 @@ SlotScene.prototype.onSubRoundStart = function(next){
 SlotScene.prototype.onSubRoundEnd = function(next){
     console.log("onSubRoundEnd");
     setTimeout(function(){
-        next({type:FNode.FNodeResultType.Next});
+        // next({type:FNode.FNodeResultType.Next});
+        next();//default
     },1000);
 
 }
@@ -154,7 +149,8 @@ SlotScene.prototype.onSubRoundEnd = function(next){
 SlotScene.prototype.onSpinStart = function(next){
     console.log("onSpinStart");
     setTimeout(function(){
-        next({type:FNode.FNodeResultType.Next});
+        // next({type:FNode.FNodeResultType.Next});
+        next(FNode.FNodeResultType.Next);//simple
     },1000);
 
 }
