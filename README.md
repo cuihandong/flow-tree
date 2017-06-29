@@ -1,8 +1,8 @@
 # flow-tree
 
 
-> js中常常有各种毁掉函数，有时候这些回掉函数构成一个复杂的系统，难以阅读和维护。
-> 为了解决这个问题，flow通过构建一棵树（类似行为树），让整体的流程一目了然。
+> js中常常有各种回调函数，有时候这些回掉函数构成一个复杂的系统，难以阅读和维护。
+> 为了解决这个问题，flow把这些回调函数通过一棵树的形式组织起来，让整体的流程一目了然。
 
 ## 安装
 
@@ -10,13 +10,21 @@
 npm install flow-tree
 ```
 
+## 支持的特性
+
+- 顺序节点
+- 循环节点
+- 选择节点
+
 ## 用法
 
 ### 作为节点的函数的写法
 ```js
 var fun1 = function(next){
     setTimeout(function(){
-        next({type:FNode.FNodeResultType.Next});
+        next();
+        // or
+        //next(FNode.FNodeResultType.Next);
     ,1000}
 }
 ```
@@ -36,7 +44,7 @@ sequence:
 
 ### 循环节点
 > 子节点返回FNode.FNodeResultType.Break退出,
-> next({type:FNode.FNodeResultType.Break});
+> next(FNode.FNodeResultType.Break);
 
 ```js
 while:
