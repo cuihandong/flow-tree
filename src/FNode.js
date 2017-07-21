@@ -46,6 +46,7 @@ var next = function(callback,res){
 ////////////////////////////////////////////////////
 var FNodeAction = function(target){
     this.target = target;
+    this.bStop = false;
 };
 
 FNodeAction.prototype.create = function(f){
@@ -53,26 +54,41 @@ FNodeAction.prototype.create = function(f){
 };
 
 FNodeAction.prototype.run = function(callback){
+    var self = this;
+    this.bStop = false;
     if(this.f){
         if(this.target){
             this.f.call(this.target,function(res){
+                if(self.bStop){
+                    return;
+                }
                 next(callback,res)
             });
 
         }
         else{
             this.f(function(res){
+                if(self.bStop){
+                    return;
+                }
                 next(callback,res)
             });
         }
     }
 };
 
+FNodeAction.prototype.stop = function(){
+    this.bStop = true;
+    if(this.f.clear_handler){
+        this.f.clear_handler();
+    }
+};
 ////////////////////////////////////////////////////
 
 var FNodeSequence = function(){
     this.callback = null;
     this.children = [];
+    this.bStop = false;
 };
 
 FNodeSequence.prototype.create = function(children) {
@@ -80,18 +96,31 @@ FNodeSequence.prototype.create = function(children) {
 };
 
 FNodeSequence.prototype.run = function(callback) {
+    this.bStop = false;
     if(this.children){
         this.callback = callback;
         this.runChild(0);
     }
 };
 
-FNodeSequence.prototype.runChild = function(index) {
+FNodeSequence.prototype.stop = function(){
+    this.bStop = true;
+    for(var i = 0;i<this.children.length;++i){
+        this.children[i].stop();
+    }
+};
 
+FNodeSequence.prototype.runChild = function(index) {
+    if(this.bStop){
+        return;
+    }
     if(this.children && this.children.length > index){
         var child = this.children[index];
         var self = this;
         child.run(function(res){
+            if(self.bStop){
+                return;
+            }
             if(res) {
                 switch (res.type) {
                     case FNodeResultType.Next : {
@@ -118,6 +147,7 @@ FNodeSequence.prototype.runChild = function(index) {
 var FNodeWhile = function(){
     this.callback = null;
     this.children = [];
+    this.bStop = false;
 };
 
 FNodeWhile.prototype.create = function(children) {
@@ -125,6 +155,7 @@ FNodeWhile.prototype.create = function(children) {
 };
 
 FNodeWhile.prototype.run = function(callback) {
+    this.bStop = false;
     if(this.children){
         this.callback = callback;
         this.runChild(0);
@@ -132,10 +163,16 @@ FNodeWhile.prototype.run = function(callback) {
 };
 
 FNodeWhile.prototype.runChild = function(index){
+    if(this.bStop){
+        return;
+    }
     if(this.children && this.children.length > index){
         var child = this.children[index];
         var self = this;
         child.run(function(res){
+            if(self.bStop){
+                return;
+            }
             if(res) {
                 switch (res.type) {
                     case FNodeResultType.Next : {
@@ -162,10 +199,18 @@ FNodeWhile.prototype.runChild = function(index){
     }
 };
 
+FNodeWhile.prototype.stop = function(){
+    this.bStop = true;
+    for(var i = 0;i<this.children.length;++i){
+        this.children[i].stop();
+    }
+};
+
 ////////////////////////////////////////////////////
 var FNodeSwitch = function(){
     this.valueNode = null;
     this.caseNodeMap = null;
+    this.bStop = false;
 };
 
 FNodeSwitch.prototype.create = function(valueNode,caseNodeMap){
@@ -174,16 +219,23 @@ FNodeSwitch.prototype.create = function(valueNode,caseNodeMap){
 };
 
 FNodeSwitch.prototype.run = function(callback){
+    this.bStop = false;
     if(this.valueNode && this.caseNodeMap){
         var self = this;
         var defaultNode = self.caseNodeMap["default"];
         this.valueNode.run(function(res){
+            if(self.bStop){
+                return;
+            }
             var node = self.caseNodeMap[res.value];
             if(node==null){
                 node = defaultNode;
             }
             if(node){
                 node.run(function(res){
+                    if(self.bStop){
+                        return;
+                    }
                     next(callback,FNodeResultType.Next);
                 })
             }
@@ -194,6 +246,13 @@ FNodeSwitch.prototype.run = function(callback){
     }
 };
 
+FNodeSwitch.prototype.stop = function(){
+    this.bStop = true;
+    this.valueNode.stop();
+    for(var key in this.caseNodeMap){
+        this.caseNodeMap[key].stop();
+    }
+};
 
 ////////////////////////////////////////////////////
 var getNodeType = function(tree){
@@ -288,6 +347,12 @@ var build = function(tree,target){
     return null;
 };
 
+var run = function(tree,target,callback){
+    var node = build(tree,target);
+    node.run(callback)
+    return node;
+};
+
 var exports = module.exports;
 exports.FNodeResultType = FNodeResultType;
 exports.FNodeAction = FNodeAction;
@@ -295,3 +360,4 @@ exports.FNodeSequence = FNodeSequence;
 exports.FNodeWhile = FNodeWhile;
 exports.FNodeSwitch = FNodeSwitch;
 exports.build = build;
+exports.run = run;
