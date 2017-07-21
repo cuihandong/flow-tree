@@ -29,9 +29,25 @@ var fun1 = function(next){
 }
 ```
 
+### 作为节点的函数可以带一个清理函数(clear_handler),在节点stop时会调用
+```js
+var fun1 = function(next){
+    var id = setTimeout(function(){
+        id = null;
+        next();
+        // or
+        //next(FNode.FNodeResultType.Next);
+    ,1000}
+    arguments.callee.clear_handler = function(){
+        if(id!=null)
+            clearInterval(id)
+        id = null;
+    }
+}
+```
+
 ### 顺序节点
 ```js
-sequence:
 [
     fun1,
     fun2,
@@ -47,7 +63,6 @@ sequence:
 > next(FNode.FNodeResultType.Break);
 
 ```js
-while:
 [
     "loop",
     fun1,
@@ -62,7 +77,6 @@ while:
 > fun0计算switch的值，通过next设置。next({type:FNode.FNodeResultType.Next,value:"value1"})
 
 ```js
-switch:
 {
     switch: fun0,
     case_value1:tree1,
@@ -72,49 +86,36 @@ switch:
 
 ### 一棵树
 ```js
-SlotScene.prototype.build = function() {
+NPC.prototype.build = function() {
     var tree = [
         "loop",
-        this.getNextResult,
+        this.idle,
         {
-            switch: this.getRoundType,
-            case_freespin: [
-                this.onRoundStartInFreeSpin,
+            switch: this.waitOrder,//sit stand
+            case_sit: [
+                this.gotoSeat,
+                this.sitDown,
                 [
                     "loop",
-                    this.onSubRoundStartInFreeSpin,
-                    this.onSpinStart,
-                    this.onSpinEnd,
-                    this.onSubRoundEndInFreeSpin,
-                    this.checkFreeSpinEnd,
+                    this.lookLeft,
+                    this.idle,
+                    this.lookRight,
+                    this.idle,
+                    this.checkTired,
                 ],
-                this.onRoundEndInFreeSpin,
             ],
-            case_normal: [
-                this.onRoundStart,
-                [
-                    this.onSubRoundStart,
-                    this.onSpinStart,
-                    this.onSpinEnd,
-                    this.onSubRoundEnd,
-                ],
-                this.onRoundEnd,
+            case_stand: [
+                this.standUp,
+                this.idle,
+                this.keke,
             ],
         },
-        [
-            this.checkAndShowBigWin,
-            this.checkAndShowJackpot,
-            this.checkAndShowAllWinLine,
-            this.showEachWinLine,//不阻塞
-        ],
-        this.waitSpinButton,
     ];
     this.runNode = FNode.build(tree,this);
 }
 
 //...
 
-var slotScene = new SlotScene();
-slotScene.build()   //建立树
-slotScene.runNode.run();  //执行数
-```
+var npc = new NPC();
+npc.build()   //建立树
+npc.runNode.run();  //执行树
