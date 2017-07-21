@@ -78,9 +78,9 @@ var fun1 = function(next){
 
 ```js
 {
-    switch: fun0,
-    case_value1:tree1,
-    case_value2:fun2,
+    "switch": fun0,
+    "case_value1":tree1,
+    "case_value2":fun2,
 }
 ```
 
@@ -91,8 +91,8 @@ NPC.prototype.build = function() {
         "loop",
         this.idle,
         {
-            switch: this.waitOrder,//sit stand
-            case_sit: [
+            "switch": this.waitOrder,//sit stand
+            "case_sit": [
                 this.gotoSeat,
                 this.sitDown,
                 [
@@ -104,7 +104,7 @@ NPC.prototype.build = function() {
                     this.checkTired,
                 ],
             ],
-            case_stand: [
+            "case_stand": [
                 this.standUp,
                 this.idle,
                 this.keke,
