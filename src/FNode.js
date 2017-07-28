@@ -44,8 +44,9 @@ var next = function(callback,res){
 }
 
 ////////////////////////////////////////////////////
-var FNodeAction = function(target){
+var FNodeAction = function(target,runtimeObj){
     this.target = target;
+    this.runtimeObj = runtimeObj;
     this.bStop = false;
 };
 
@@ -63,7 +64,7 @@ FNodeAction.prototype.run = function(callback){
                     return;
                 }
                 next(callback,res)
-            });
+            },self.runtimeObj);
 
         }
         else{
@@ -72,7 +73,7 @@ FNodeAction.prototype.run = function(callback){
                     return;
                 }
                 next(callback,res)
-            });
+            },self.runtimeObj);
         }
     }
 };
@@ -277,9 +278,9 @@ var getNodeType = function(tree){
     return null;
 };
 
-var buildSwitch = function(tree,target){
-    var switchNode = new FNodeSwitch(target);
-    var valueNode = buildAction(tree.switch,target);
+var buildSwitch = function(tree,target,runtimeObj){
+    var switchNode = new FNodeSwitch(target,runtimeObj);
+    var valueNode = buildAction(tree.switch,target,runtimeObj);
     var m = {};
     for(var key in tree){
         if(key=="switch"){
@@ -288,67 +289,86 @@ var buildSwitch = function(tree,target){
         if(key.search("case_")==0){
             var c = key.substring(5);
             var subtree = tree[key];
-            m[c] = build(subtree,target);
+            m[c] = build(subtree,target,runtimeObj);
         }
     }
     switchNode.create(valueNode,m);
     return switchNode;
 };
 
-var buildSequence = function(tree,target){
+var buildSequence = function(tree,target,runtimeObj){
     if(tree && tree.length>0){
         var children = [];
         for(var i = 0;i<tree.length;++i){
-            var node = build(tree[i],target);
+            var node = build(tree[i],target,runtimeObj);
             if(node){
                 children.push(node);
             }
         }
-        var sequenceNode = new FNodeSequence(target);
+        var sequenceNode = new FNodeSequence(target,runtimeObj);
         sequenceNode.create(children);
         return sequenceNode;
     }
     return null;
 };
 
-var buildWhile = function(tree,target){
+var buildWhile = function(tree,target,runtimeObj){
     if(tree && tree.length>0){
         var children = [];
         //第一个元素是"loop",所以直接从第二个元素开始
         for(var i = 1;i<tree.length;++i){
-            var node = build(tree[i],target);
+            var node = build(tree[i],target,runtimeObj);
             if(node){
                 children.push(node);
             }
         }
-        var whileNode = new FNodeWhile(target);
+        var whileNode = new FNodeWhile(target,runtimeObj);
         whileNode.create(children);
         return whileNode;
     }
     return null;
 };
 
-var buildAction = function(node,target){
-    var actionNode = new FNodeAction(target);
+var buildAction = function(node,target,runtimeObj){
+    var actionNode = new FNodeAction(target,runtimeObj);
     actionNode.create(node);
     return actionNode;
 };
 
-var build = function(tree,target){
+var build = function(tree,target,runtimeObj){
+    if(runtimeObj==null){
+        runtimeObj = {};
+    }
     var t = getNodeType(tree);
     switch(t){
-        case FNodeType.While: return buildWhile(tree,target);
-        case FNodeType.Sequence: return buildSequence(tree,target);
-        case FNodeType.Switch: return buildSwitch(tree,target);
-        case FNodeType.Action: return buildAction(tree,target);
+        case FNodeType.While: return buildWhile(tree,target,runtimeObj);
+        case FNodeType.Sequence: return buildSequence(tree,target,runtimeObj);
+        case FNodeType.Switch: return buildSwitch(tree,target,runtimeObj);
+        case FNodeType.Action: return buildAction(tree,target,runtimeObj);
         default:
             console.log("can not find builder, type:",t);
     }
     return null;
 };
 
-var run = function(tree,target,callback){
-    var node = build(tree,target);
+/**
+ * support:
+ *     run(tree,target,runtimeObj,callback)
+ *     run(tree,target,callback)
+ * @param tree
+ * @param target
+ * @param runtimeObj
+ * @param callback
+ */
+var run = function(tree,target,runtimeObj,callback){
+    if(typeof runtimeObj == "function"){
+        callback = runtimeObj;
+        runtimeObj = {}
+    }
+    if(runtimeObj==null){
+        runtimeObj = {}
+    }
+    var node = build(tree,target,runtimeObj);
     node.run(callback)
     return node;
 };
