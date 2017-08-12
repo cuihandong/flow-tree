@@ -129,10 +129,8 @@ FNodeSequence.prototype.runChild = function(index) {
                         break;
                     }
                     case FNodeResultType.Break : {
-                        if(this.callback){
-                            next(this.callback,FNodeResultType.Next);
-                            this.callback = null;
-                        }
+                        next(self.callback,FNodeResultType.Next);
+                        self.callback = null;
                         break;
                     }
                 }
@@ -140,10 +138,8 @@ FNodeSequence.prototype.runChild = function(index) {
         });
     }
     else{
-        if(this.callback){
-            next(this.callback,FNodeResultType.Next);
-            this.callback = null;
-        }
+        next(this.callback,FNodeResultType.Next);
+        this.callback = null;
     }
 };
 
@@ -188,10 +184,8 @@ FNodeWhile.prototype.runChild = function(index){
                         break;
                     }
                     case FNodeResultType.Break : {
-                        if(self.callback){
-                            next(self.callback,FNodeResultType.Next);
-                            self.callback = null;
-                        }
+                        next(self.callback,FNodeResultType.Next);
+                        self.callback = null;
                         break;
                     }
                 }
