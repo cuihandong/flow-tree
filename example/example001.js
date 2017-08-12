@@ -49,11 +49,11 @@ SlotScene.prototype.build = function() {
         ],
         this.waitSpinButton,
     ];
-    this.runNode = FNode.build(tree,this);
+    this.runNode = FNode.build(tree,this,{value:"value1"});
 }
 
-SlotScene.prototype.getNextResult = function(next){
-
+SlotScene.prototype.getNextResult = function(next,data){
+    console.log("data:",data)
     if(Math.random()>0.9){
         this.leftFreeSpinCount = 1;
     }
@@ -81,7 +81,8 @@ SlotScene.prototype.getNextResult = function(next){
     next({type:FNode.FNodeResultType.Next});
 }
 
-SlotScene.prototype.getRoundType = function(next){
+SlotScene.prototype.getRoundType = function(next,data){
+    console.log("data:",data)
     var res = {};
     res.value = "freespin";
     res.value = "normal";
@@ -89,7 +90,8 @@ SlotScene.prototype.getRoundType = function(next){
     next(res);
 }
 
-SlotScene.prototype.checkFreeSpinEnd = function(next){
+SlotScene.prototype.checkFreeSpinEnd = function(next,data){
+    console.log("data:",data)
     if(this.leftFreeSpinCount <=0 ){
         next({type:FNode.FNodeResultType.Break});
     }
@@ -98,47 +100,53 @@ SlotScene.prototype.checkFreeSpinEnd = function(next){
     }
 }
 
-SlotScene.prototype.onRoundStart = function(next){
+SlotScene.prototype.onRoundStart = function(next,data){
     console.log("onRoundStart");
+    console.log("data:",data)
     setTimeout(function(){
         next({type:FNode.FNodeResultType.Next});
     },1000);
 
 }
 
-SlotScene.prototype.onRoundEnd = function(next){
+SlotScene.prototype.onRoundEnd = function(next,data){
     console.log("onRoundEnd");
+    console.log("data:",data)
     setTimeout(function(){
         next({type:FNode.FNodeResultType.Next});
     },1000);
 
 }
 
-SlotScene.prototype.onRoundStartInFreeSpin = function(next){
+SlotScene.prototype.onRoundStartInFreeSpin = function(next,data){
     console.log("onRoundStartInFreeSpin");
+    console.log("data:",data)
     setTimeout(function(){
         next({type:FNode.FNodeResultType.Next});
     },1000);
 
 }
 
-SlotScene.prototype.onRoundEndInFreeSpin = function(next){
+SlotScene.prototype.onRoundEndInFreeSpin = function(next,data){
     console.log("onRoundEndInFreeSpin");
+    console.log("data:",data)
     setTimeout(function(){
         next({type:FNode.FNodeResultType.Next});
     },1000);
 
 }
-SlotScene.prototype.onSubRoundStart = function(next){
+SlotScene.prototype.onSubRoundStart = function(next,data){
     console.log("onSubRoundStart");
+    console.log("data:",data)
     setTimeout(function(){
         next({type:FNode.FNodeResultType.Next});
     },1000);
 
 }
 
-SlotScene.prototype.onSubRoundEnd = function(next){
+SlotScene.prototype.onSubRoundEnd = function(next,data){
     console.log("onSubRoundEnd");
+    console.log("data:",data)
     setTimeout(function(){
         // next({type:FNode.FNodeResultType.Next});
         next();//default
@@ -146,8 +154,9 @@ SlotScene.prototype.onSubRoundEnd = function(next){
 
 }
 
-SlotScene.prototype.onSpinStart = function(next){
+SlotScene.prototype.onSpinStart = function(next,data){
     console.log("onSpinStart");
+    console.log("data:",data)
     setTimeout(function(){
         // next({type:FNode.FNodeResultType.Next});
         next(FNode.FNodeResultType.Next);//simple
@@ -155,24 +164,27 @@ SlotScene.prototype.onSpinStart = function(next){
 
 }
 
-SlotScene.prototype.onSpinEnd = function(next){
+SlotScene.prototype.onSpinEnd = function(next,data){
     console.log("onSpinEnd");
+    console.log("data:",data)
     setTimeout(function(){
         next({type:FNode.FNodeResultType.Next});
     },1000);
 
 }
 
-SlotScene.prototype.onSubRoundStartInFreeSpin = function(next) {
+SlotScene.prototype.onSubRoundStartInFreeSpin = function(next,data) {
     console.log("onSubRoundStartInFreeSpin");
+    console.log("data:",data)
     setTimeout(function(){
         next({type:FNode.FNodeResultType.Next});
     },1000);
 
 }
 
-SlotScene.prototype.onSubRoundEndInFreeSpin = function(next) {
+SlotScene.prototype.onSubRoundEndInFreeSpin = function(next,data) {
     console.log("onSubRoundEndInFreeSpin");
+    console.log("data:",data)
     setTimeout(function(){
         next({type:FNode.FNodeResultType.Next});
     },1000);
@@ -180,8 +192,9 @@ SlotScene.prototype.onSubRoundEndInFreeSpin = function(next) {
 
 
 /////////////////////
-SlotScene.prototype.checkAndShowBigWin = function(next) {
+SlotScene.prototype.checkAndShowBigWin = function(next,data) {
     console.log("checkAndShowBigWin");
+    console.log("data:",data)
     if(this.winChips>10000){
         console.log("show big win");
         setTimeout(function(){
@@ -194,8 +207,9 @@ SlotScene.prototype.checkAndShowBigWin = function(next) {
     }
 }
 
-SlotScene.prototype.checkAndShowJackpot = function(next) {
+SlotScene.prototype.checkAndShowJackpot = function(next,data) {
     console.log("checkAndShowJackpot");
+    console.log("data:",data)
     if(this.jackpotTrigger){
         console.log("show jackpot dialog");
         setTimeout(function(){
@@ -208,8 +222,9 @@ SlotScene.prototype.checkAndShowJackpot = function(next) {
     }
 }
 
-SlotScene.prototype.checkAndShowAllWinLine = function(next) {
+SlotScene.prototype.checkAndShowAllWinLine = function(next,data) {
     console.log("checkAndShowAllWinLine");
+    console.log("data:",data)
     if(this.winChips>0){
         console.log("show all win line");
         setTimeout(function(){
@@ -222,8 +237,9 @@ SlotScene.prototype.checkAndShowAllWinLine = function(next) {
     }
 }
 
-SlotScene.prototype.showEachWinLine = function(next) {
+SlotScene.prototype.showEachWinLine = function(next,data) {
     console.log("showEachWinLine");
+    console.log("data:",data)
     if(this.winlines && this.winlines.length>0){
         console.log("show each win line");
         setTimeout(function(){
@@ -236,8 +252,9 @@ SlotScene.prototype.showEachWinLine = function(next) {
     }
 }
 
-SlotScene.prototype.waitSpinButton = function(next) {
+SlotScene.prototype.waitSpinButton = function(next,data) {
     console.log("waitSpinButton");
+    console.log("data:",data)
     setTimeout(function(){
         next({type:FNode.FNodeResultType.Next});
     },1000);
