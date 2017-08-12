@@ -129,7 +129,10 @@ FNodeSequence.prototype.runChild = function(index) {
                         break;
                     }
                     case FNodeResultType.Break : {
-                        self.run(self.callback);
+                        if(this.callback){
+                            next(this.callback,FNodeResultType.Next);
+                            this.callback = null;
+                        }
                         break;
                     }
                 }
